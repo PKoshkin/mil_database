@@ -77,6 +77,11 @@ INSERT INTO weapon_types (distance_range, max_height, min_height, max_charge, ma
 INSERT INTO weapon_types (distance_range, max_height, min_height, max_charge, max_velocity, weapon_type_name) VALUES (4.2, 2.0, 0.0, 1000, 300.0, 'Стрела 1');
 INSERT INTO weapon_types (distance_range, max_height, min_height, max_charge, max_velocity, weapon_type_name) VALUES (16.0, 10.0, 0.01, 16, 1000.0, 'Тор М2ДТ');
 
+INSERT INTO defense_objects_types (importance, defense_object_type_name) VALUES (1.0, 'Жилой дом');
+INSERT INTO defense_objects_types (importance, defense_object_type_name) VALUES (10.0, 'КП');
+INSERT INTO defense_objects_types (importance, defense_object_type_name) VALUES (100.0, 'АЭС');
+
+
 --functions
 --CREATE FUNCTION calculate_danger(INTEGER) RETURNS DECIMAL AS '
 --DECLARE
