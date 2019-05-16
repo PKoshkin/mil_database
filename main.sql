@@ -19,6 +19,7 @@ CREATE TABLE targets (
     enemy_id SERIAL NOT NULL,
     x DECIMAL NOT NULL,
     y DECIMAL NOT NULL,
+    height DECIMAL NOT NULL,
     velocity_x DECIMAL NOT NULL,
     velocity_y DECIMAL NOT NULL,
     CONSTRAINT targets_pk PRIMARY KEY (enemy_id)
@@ -33,8 +34,9 @@ CREATE TABLE weapons (
 );
 CREATE TABLE weapon_types (
     weapon_type_id SERIAL NOT NULL,
-    x DECIMAL NOT NULL,
-    y DECIMAL NOT NULL,
+    distance_range DECIMAL NOT NULL,
+    max_height DECIMAL NOT NULL,
+    min_height DECIMAL NOT NULL,
     max_charge INTEGER NOT NULL,
     weapon_type_name varchar(100) NOT NULL,
     CONSTRAINT weapon_types_pk PRIMARY KEY (weapon_type_id)
