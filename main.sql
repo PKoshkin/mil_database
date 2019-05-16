@@ -38,6 +38,7 @@ CREATE TABLE weapon_types (
     max_height DECIMAL NOT NULL,
     min_height DECIMAL NOT NULL,
     max_charge INTEGER NOT NULL,
+    max_velocity DECIMAL NOT NULL,
     weapon_type_name varchar(100) NOT NULL,
     CONSTRAINT weapon_types_pk PRIMARY KEY (weapon_type_id)
 );
@@ -69,6 +70,12 @@ ALTER TABLE defense_objects ADD CONSTRAINT defense_objects_fk FOREIGN KEY (defen
 ALTER TABLE orders ADD CONSTRAINT orders_fk1 FOREIGN KEY (enemy_id) REFERENCES targets(enemy_id);
 ALTER TABLE orders ADD CONSTRAINT orders_fk2 FOREIGN KEY (weapon_id) REFERENCES weapons(weapon_id);
 
+
+--insert values to constant tables
+INSERT INTO weapon_types (distance_range, max_height, min_height, max_charge, max_velocity, weapon_type_name) VALUES (70.0, 35.0, 0.015, 12, 3000.0, 'Бук M3');
+INSERT INTO weapon_types (distance_range, max_height, min_height, max_charge, max_velocity, weapon_type_name) VALUES (8.0, 3.5, 0.0, 100, 600.0, 'Тунгуска');
+INSERT INTO weapon_types (distance_range, max_height, min_height, max_charge, max_velocity, weapon_type_name) VALUES (4.2, 2.0, 0.0, 1000, 300.0, 'Стрела 1');
+INSERT INTO weapon_types (distance_range, max_height, min_height, max_charge, max_velocity, weapon_type_name) VALUES (16.0, 10.0, 0.01, 16, 1000.0, 'Тор М2ДТ');
 
 --functions
 --CREATE FUNCTION calculate_danger(INTEGER) RETURNS DECIMAL AS '
