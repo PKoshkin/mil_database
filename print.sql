@@ -2,9 +2,12 @@ SELECT get_the_most_dangerous();
 
 SELECT
     targets.enemy_id AS enemy_id,
-    SUM(defense_objects_types.importance * SQRT((targets.x - defense_objects.x) * (targets.x - defense_objects.x) + (targets.y - defense_objects.y) * (targets.y - defense_objects.y))) AS danger
-FROM targets, defense_objects
-INNER JOIN defense_objects_types
-ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
-GROUP BY targets.enemy_id
-ORDER BY danger DESC;
+    targets.x AS x,
+    targets.y AS y,
+    weapon_types.weapon_type_name AS name,
+    weapons.x AS weapon_x,
+    weapons.y AS weapon_y
+FROM targets, weapons
+INNER JOIN weapon_types
+ON weapon_types.weapon_type_id = weapons.weapon_type_id
+WHERE targets.enemy_id = 7;

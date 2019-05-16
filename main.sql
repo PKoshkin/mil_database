@@ -95,7 +95,7 @@ BEGIN
     FROM (
         SELECT
             targets.enemy_id AS enemy_id,
-            SUM(defense_objects_types.importance * SQRT((targets.x - defense_objects.x) * (targets.x - defense_objects.x) + (targets.y - defense_objects.y) * (targets.y - defense_objects.y))) AS danger
+            SUM(defense_objects_types.importance * ((targets.x - defense_objects.x) * (targets.x - defense_objects.x) + (targets.y - defense_objects.y) * (targets.y - defense_objects.y))) AS danger
         FROM targets, defense_objects
         INNER JOIN defense_objects_types
         ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
@@ -103,6 +103,15 @@ BEGIN
         ORDER BY danger DESC
         LIMIT 1
     ) AS tmp;
+    RETURN result;
+END;
+' LANGUAGE plpgsql;
+
+CREATE FUNCTION distance(decimal, decimal, decimal, decimal) RETURNS DECIMAL AS '
+DECLARE
+    result DECIMAL;
+BEGIN
+    SELECT SQRT(($1 - $2) * ($1 - $2) + ($3 - $4) * ($3 - $4)) INTO result;
     RETURN result;
 END;
 ' LANGUAGE plpgsql;
