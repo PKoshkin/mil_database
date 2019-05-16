@@ -14,6 +14,10 @@ DROP TABLE IF EXISTS defense_objects_types;
 DROP TABLE IF EXISTS orders;
 
 
+--drop functions
+DROP FUNCTION IF EXISTS get_the_most_dangerous();
+
+
 --create tables
 CREATE TABLE targets (
     enemy_id SERIAL NOT NULL,
