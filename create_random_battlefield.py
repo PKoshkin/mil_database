@@ -2,7 +2,10 @@ import numpy as np
 
 
 HALF_SIZE = 20
+MIN_HEIGHT = 0
 MAX_HEIGHT = 10
+MIN_VELOCITY = 100
+MAX_VELOCITY = 1100
 
 
 def make_target(x, y, height, velocity_x, velocity_y, handler):
@@ -23,9 +26,11 @@ def make_defense_object(defense_object_type_id, x, y):
 def make_targets(number, handler):
     xs = np.random.uniform(-HALF_SIZE, HALF_SIZE, number)
     ys = np.random.uniform(-HALF_SIZE, HALF_SIZE, number)
-    heights = np.random.uniform(0, MAX_HEIGHT, number)
-    velocity_xs = np.random.uniform(100, 2000, number)
-    velocity_ys = np.random.uniform(100, 2000, number)
+    heights = np.random.uniform(MIN_HEIGHT, MAX_HEIGHT, number)
+    velocity_norm = np.random.uniform(MIN_VELOCITY, MAX_VELOCITY, number)
+    velocity_angle = np.random.uniform(0, 2 * np.pi, number)
+    velocity_xs = velocity_norm * np.cos(velocity_angle)
+    velocity_ys = velocity_norm * np.sin(velocity_angle)
     for x, y, height, velocity_x, velocity_y in zip(xs, ys, heights, velocity_xs, velocity_ys):
         make_target(x, y, height, velocity_x, velocity_y, handler)
 
@@ -37,7 +42,7 @@ def make_weapons(number, handler):
         3: 1000,
         4: 16
     }
-    weapon_type_ids = np.random.randint(min(weapon_id_to_max_charge), max(weapon_id_to_max_charge), number)
+    weapon_type_ids = np.random.randint(min(weapon_id_to_max_charge), max(weapon_id_to_max_charge) + 1, number)
     charges = list(map(lambda weapon_id: weapon_id_to_max_charge[weapon_id], weapon_type_ids))
     xs = np.random.uniform(-HALF_SIZE, HALF_SIZE, number)
     ys = np.random.uniform(-HALF_SIZE, HALF_SIZE, number)

@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS orders;
 --drop functions
 DROP FUNCTION IF EXISTS get_the_most_dangerous();
 DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
+DROP FUNCTION IF EXISTS norm(decimal, decimal);
 
 
 --create tables
@@ -88,16 +89,45 @@ INSERT INTO defense_objects_types (importance, defense_object_type_name) VALUES 
 
 
 --functions
+CREATE FUNCTION norm(decimal, decimal) RETURNS DECIMAL AS '
+DECLARE
+    result DECIMAL;
+BEGIN
+    SELECT SQRT($1 * $1 + $2 * $2) INTO result;
+    RETURN result;
+END;
+' LANGUAGE plpgsql;
+
 CREATE FUNCTION distance(decimal, decimal, decimal, decimal) RETURNS DECIMAL AS '
 DECLARE
     result DECIMAL;
 BEGIN
-    SELECT SQRT(($1 - $2) * ($1 - $2) + ($3 - $4) * ($3 - $4)) INTO result;
+    SELECT norm($1 - $2, $3 - $4) INTO result;
     RETURN result;
 END;
 ' LANGUAGE plpgsql;
 
 CREATE FUNCTION get_the_most_dangerous() RETURNS INTEGER AS '
+DECLARE
+    result INTEGER;
+BEGIN
+    SELECT enemy_id INTO result
+    FROM (
+        SELECT
+            targets.enemy_id AS enemy_id,
+            SUM(defense_objects_types.importance * distance(targets.x, defense_objects.x, targets.y, defense_objects.y)) AS danger
+        FROM targets, defense_objects
+        INNER JOIN defense_objects_types
+        ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
+        GROUP BY targets.enemy_id
+        ORDER BY danger DESC
+        LIMIT 1
+    ) AS tmp;
+    RETURN result;
+END;
+' LANGUAGE plpgsql;
+
+CREATE FUNCTION get_possible_shots() RETURNS INTEGER AS '
 DECLARE
     result INTEGER;
 BEGIN
