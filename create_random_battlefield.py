@@ -28,12 +28,12 @@ def make_targets(number, handler):
 
 def make_weapons(number, handler):
     weapon_id_to_max_charge = {
-        0: 12,
-        1: 100,
-        2: 1000,
-        3: 16
+        1: 12,
+        2: 100,
+        3: 1000,
+        4: 16
     }
-    weapon_type_ids = np.random.randint(0, len(weapon_id_to_max_charge), number)
+    weapon_type_ids = np.random.randint(min(weapon_id_to_max_charge), max(weapon_id_to_max_charge), number)
     charges = list(map(lambda weapon_id: weapon_id_to_max_charge[weapon_id], weapon_type_ids))
     xs = np.random.uniform(-200, 200, number)
     ys = np.random.uniform(-200, 200, number)
@@ -44,7 +44,7 @@ def make_weapons(number, handler):
 def make_defense_objects(number, handler):
     xs = np.random.uniform(-200, 200, number)
     ys = np.random.uniform(-200, 200, number)
-    defense_object_type_ids = np.random.randint(0, 3, number)
+    defense_object_type_ids = np.random.randint(1, 4, number)
     for defense_object_type_id, x, y in zip(defense_object_type_ids, xs, ys):
         make_defense_object(defense_object_type_id, x, y)
 

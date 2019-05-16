@@ -92,3 +92,5 @@ INSERT INTO defense_objects_types (importance, defense_object_type_name) VALUES 
 --    RETURN result;
 --END;
 --' LANGUAGE plpgsql;
+
+SELECT * FROM weapon_types;
