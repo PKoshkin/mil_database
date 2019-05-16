@@ -15,51 +15,51 @@ DROP TABLE IF EXISTS "orders";
 
 
 --create tables
-CREATE TABLE "targets" (
-	"enemy_id" serial NOT NULL,
-	"x" DECIMAL NOT NULL,
-	"y" DECIMAL NOT NULL,
-	"velocity_x" DECIMAL NOT NULL,
-	"velocity_y" DECIMAL NOT NULL,
-	CONSTRAINT targets_pk PRIMARY KEY ("enemy_id")
+    CREATE TABLE "targets" (
+    "enemy_id" serial NOT NULL,
+    "x" DECIMAL NOT NULL,
+    "y" DECIMAL NOT NULL,
+    "velocity_x" DECIMAL NOT NULL,
+    "velocity_y" DECIMAL NOT NULL,
+    CONSTRAINT targets_pk PRIMARY KEY ("enemy_id")
 );
-CREATE TABLE "weapons" (
-	"weapon_id" serial NOT NULL,
-	"weapon_type_id" integer NOT NULL,
-	"charge" integer NOT NULL,
-	"x" DECIMAL NOT NULL,
-	"y" DECIMAL NOT NULL,
-	CONSTRAINT weapons_pk PRIMARY KEY ("weapon_id")
+    CREATE TABLE "weapons" (
+    "weapon_id" serial NOT NULL,
+    "weapon_type_id" integer NOT NULL,
+    "charge" integer NOT NULL,
+    "x" DECIMAL NOT NULL,
+    "y" DECIMAL NOT NULL,
+    CONSTRAINT weapons_pk PRIMARY KEY ("weapon_id")
 );
-CREATE TABLE "weapon_types" (
-	"weapon_type_id" serial NOT NULL,
-	"x" DECIMAL NOT NULL,
-	"y" DECIMAL NOT NULL,
-	"max_charge" integer NOT NULL,
-	"weapon_type_name" varchar(100) NOT NULL,
-	CONSTRAINT weapon_types_pk PRIMARY KEY ("weapon_type_id")
+    CREATE TABLE "weapon_types" (
+    "weapon_type_id" serial NOT NULL,
+    "x" DECIMAL NOT NULL,
+    "y" DECIMAL NOT NULL,
+    "max_charge" integer NOT NULL,
+    "weapon_type_name" varchar(100) NOT NULL,
+    CONSTRAINT weapon_types_pk PRIMARY KEY ("weapon_type_id")
 );
 CREATE TABLE "defense_objects" (
-	"defense_object_id" serial NOT NULL,
+    "defense_object_id" serial NOT NULL,
     "defense_object_type_id" integer NOT NULL,
-	"x" DECIMAL NOT NULL,
-	"y" DECIMAL NOT NULL,
-	"velocity_x" DECIMAL NOT NULL,
-	"velocity_y" DECIMAL NOT NULL,
-	CONSTRAINT defense_objects_pk PRIMARY KEY ("defense_object_id")
+    "x" DECIMAL NOT NULL,
+    "y" DECIMAL NOT NULL,
+    "velocity_x" DECIMAL NOT NULL,
+    "velocity_y" DECIMAL NOT NULL,
+    CONSTRAINT defense_objects_pk PRIMARY KEY ("defense_object_id")
 );
-CREATE TABLE "defense_objects_types" (
+    CREATE TABLE "defense_objects_types" (
     "defense_object_type_id" serial NOT NULL,
-	"importance" DECIMAL NOT NULL,
-	"defense_object_type_name" varchar(100) NOT NULL,
-	CONSTRAINT defense_objects_types_pk PRIMARY KEY ("defense_object_type_id")
+    "importance" DECIMAL NOT NULL,
+    "defense_object_type_name" varchar(100) NOT NULL,
+    CONSTRAINT defense_objects_types_pk PRIMARY KEY ("defense_object_type_id")
 );
-CREATE TABLE "orders" (
-	"order_id" serial NOT NULL,
+    CREATE TABLE "orders" (
+    "order_id" serial NOT NULL,
     "enemy_id" integer NOT NULL,
     "weapon_id" integer NOT NULL,
     "damage" integer NOT NULL,
-	CONSTRAINT orders_pk PRIMARY KEY ("order_id")
+    CONSTRAINT orders_pk PRIMARY KEY ("order_id")
 );
 
 
