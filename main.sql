@@ -5,6 +5,10 @@ ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk1;
 ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk2;
 
 
+--drop views
+DROP VIEW IF EXISTS possible_shots;
+
+
 --drop tables
 DROP TABLE IF EXISTS targets;
 DROP TABLE IF EXISTS weapons;
@@ -15,9 +19,9 @@ DROP TABLE IF EXISTS orders;
 
 
 --drop functions
-DROP FUNCTION IF EXISTS get_the_most_dangerous();
-DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
 DROP FUNCTION IF EXISTS norm(decimal, decimal);
+DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
+DROP FUNCTION IF EXISTS get_the_most_dangerous();
 
 
 --create tables
@@ -127,22 +131,19 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
-CREATE FUNCTION get_possible_shots() RETURNS INTEGER AS '
-DECLARE
-    result INTEGER;
-BEGIN
-    SELECT enemy_id INTO result
-    FROM (
-        SELECT
-            targets.enemy_id AS enemy_id,
-            SUM(defense_objects_types.importance * distance(targets.x, defense_objects.x, targets.y, defense_objects.y)) AS danger
-        FROM targets, defense_objects
-        INNER JOIN defense_objects_types
-        ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
-        GROUP BY targets.enemy_id
-        ORDER BY danger DESC
-        LIMIT 1
-    ) AS tmp;
-    RETURN result;
-END;
-' LANGUAGE plpgsql;
+
+--views
+CREATE VIEW possible_shots AS
+SELECT
+    targets.enemy_id AS enemy_id,
+    weapon_types.weapon_type_name AS weapon_type,
+    weapons.weapon_id AS weapon_id,
+    distance(weapons.x, targets.x, weapons.y, targets.y) AS distance
+FROM targets, weapons
+INNER JOIN weapon_types
+ON weapon_types.weapon_type_id = weapons.weapon_type_id
+WHERE (distance(weapons.x, targets.x, weapons.y, targets.y) < weapon_types.distance_range)
+    AND (targets.height <= weapon_types.max_height)
+    AND (targets.height >= weapon_types.min_height)
+    AND (norm(targets.velocity_x, targets.velocity_y) < weapon_types.max_velocity)
+ORDER BY enemy_id;
