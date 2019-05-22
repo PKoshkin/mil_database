@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS orders;
 DROP FUNCTION IF EXISTS norm(decimal, decimal);
 DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
 DROP FUNCTION IF EXISTS get_the_most_dangerous();
+DROP FUNCTION IF EXISTS attack_get_the_most_dangerous();
 
 
 --create tables
@@ -69,7 +70,6 @@ CREATE TABLE orders (
     order_id SERIAL NOT NULL,
     enemy_id INTEGER NOT NULL,
     weapon_id INTEGER NOT NULL,
-    damage INTEGER NOT NULL,
     CONSTRAINT orders_pk PRIMARY KEY (order_id)
 );
 
@@ -131,6 +131,19 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
+CREATE FUNCTION attack_get_the_most_dangerous() RETURNS VOID AS'
+DECLARE
+
+BEGIN
+    INSERT INTO orders (enemy_id, weapon_id)
+    SELECT enemy_id, weapon_id
+    FROM possible_shots
+    WHERE enemy_id = get_the_most_dangerous()
+    ORDER BY distance
+    LIMIT 1;
+END;
+' LANGUAGE plpgsql;
+
 
 --views
 CREATE VIEW possible_shots AS
@@ -146,4 +159,4 @@ WHERE (distance(weapons.x, targets.x, weapons.y, targets.y) < weapon_types.dista
     AND (targets.height <= weapon_types.max_height)
     AND (targets.height >= weapon_types.min_height)
     AND (norm(targets.velocity_x, targets.velocity_y) < weapon_types.max_velocity)
-ORDER BY enemy_id;
+ORDER BY targets.enemy_id;
