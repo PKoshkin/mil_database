@@ -161,4 +161,5 @@ WHERE (distance(weapons.x, targets.x, weapons.y, targets.y) < weapon_types.dista
     AND (targets.height >= weapon_types.min_height)
     AND (norm(targets.velocity_x, targets.velocity_y) < weapon_types.max_velocity)
     AND weapons.weapon_id NOT IN (SELECT weapon_id FROM orders)
+    AND targets.enemy_id NOT IN (SELECT enemy_id FROM orders)
 ORDER BY targets.enemy_id;
