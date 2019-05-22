@@ -124,6 +124,7 @@ BEGIN
         INNER JOIN defense_objects_types
         ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
         GROUP BY targets.enemy_id
+        HAVING enemy_id NOT IN (SELECT enemy_id FROM orders)
         ORDER BY danger DESC
         LIMIT 1
     ) AS tmp;
@@ -159,4 +160,5 @@ WHERE (distance(weapons.x, targets.x, weapons.y, targets.y) < weapon_types.dista
     AND (targets.height <= weapon_types.max_height)
     AND (targets.height >= weapon_types.min_height)
     AND (norm(targets.velocity_x, targets.velocity_y) < weapon_types.max_velocity)
+    AND weapons.weapon_id NOT IN (SELECT weapon_id FROM orders)
 ORDER BY targets.enemy_id;
