@@ -7,6 +7,7 @@ ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk2;
 
 --drop views
 DROP VIEW IF EXISTS possible_shots;
+DROP VIEW IF EXISTS targets_with_danger ;
 
 
 --drop tables
@@ -118,14 +119,8 @@ BEGIN
     SELECT enemy_id INTO result
     FROM (
         SELECT
-            targets.enemy_id AS enemy_id,
-            SUM(defense_objects_types.importance * distance(targets.x, defense_objects.x, targets.y, defense_objects.y)) AS danger
-        FROM targets, defense_objects
-        INNER JOIN defense_objects_types
-        ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
-        GROUP BY targets.enemy_id
-        HAVING enemy_id NOT IN (SELECT enemy_id FROM orders)
-        ORDER BY danger DESC
+            enemy_id
+        FROM targets_with_danger
         LIMIT 1
     ) AS tmp;
     RETURN result;
@@ -163,3 +158,14 @@ WHERE (distance(weapons.x, targets.x, weapons.y, targets.y) < weapon_types.dista
     AND weapons.weapon_id NOT IN (SELECT weapon_id FROM orders)
     AND targets.enemy_id NOT IN (SELECT enemy_id FROM orders)
 ORDER BY targets.enemy_id;
+
+CREATE VIEW targets_with_danger AS
+SELECT
+    targets.enemy_id AS enemy_id,
+    SUM(defense_objects_types.importance * distance(targets.x, defense_objects.x, targets.y, defense_objects.y)) AS danger
+FROM targets, defense_objects
+INNER JOIN defense_objects_types
+ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
+GROUP BY targets.enemy_id
+HAVING enemy_id NOT IN (SELECT enemy_id FROM orders)
+ORDER BY danger DESC;
