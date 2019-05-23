@@ -10,6 +10,10 @@ DROP VIEW IF EXISTS possible_shots;
 DROP VIEW IF EXISTS targets_with_danger ;
 
 
+--drop triggers
+DROP TRIGGER IF EXISTS DELETE_ORDER_ON_TARGET_DESTROY ON targets;
+
+
 --drop tables
 DROP TABLE IF EXISTS targets;
 DROP TABLE IF EXISTS weapons;
@@ -24,6 +28,8 @@ DROP FUNCTION IF EXISTS norm(decimal, decimal);
 DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
 DROP FUNCTION IF EXISTS get_the_most_dangerous();
 DROP FUNCTION IF EXISTS attack_get_the_most_dangerous();
+DROP FUNCTION IF EXISTS delete_order_on_target_destroy();
+DROP FUNCTION IF EXISTS execute_orders();
 
 
 --create tables
@@ -140,6 +146,25 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
+CREATE FUNCTION execute_orders() RETURNS VOID AS'
+DECLARE
+
+BEGIN
+    DELETE FROM targets
+    WHERE enemy_id IN (SELECT enemy_id FROM orders);
+END;
+' LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_order_on_target_destroy() RETURNS TRIGGER AS'
+DECLARE
+
+BEGIN
+    DELETE FROM ORDERS
+    WHERE enemy_id = OLD.enemy_id;
+    RETURN OLD;
+END;
+' LANGUAGE plpgsql;
+
 
 --views
 CREATE VIEW possible_shots AS
@@ -170,3 +195,7 @@ ON defense_objects_types.defense_object_type_id = defense_objects.defense_object
 GROUP BY targets.enemy_id
 HAVING enemy_id NOT IN (SELECT enemy_id FROM orders)
 ORDER BY danger DESC;
+
+
+--trigers
+CREATE TRIGGER DELETE_ORDER_ON_TARGET_DESTROY BEFORE DELETE ON targets FOR EACH ROW EXECUTE PROCEDURE delete_order_on_target_destroy();
