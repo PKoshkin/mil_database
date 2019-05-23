@@ -32,6 +32,8 @@ ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk2;
 DROP VIEW IF EXISTS possible_shots;
 DROP VIEW IF EXISTS targets_with_danger;
 DROP VIEW IF EXISTS charge_stocks;
+DROP VIEW IF EXISTS defense_objects_in_danger;
+DROP VIEW IF EXISTS weapons_types_statistics;
 
 
 --drop triggers
@@ -51,7 +53,7 @@ DROP TABLE IF EXISTS orders;
 DROP FUNCTION IF EXISTS norm(decimal, decimal);
 DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
 DROP FUNCTION IF EXISTS get_the_most_dangerous();
-DROP FUNCTION IF EXISTS attack_get_the_most_dangerous();
+DROP FUNCTION IF EXISTS attack_the_most_dangerous();
 DROP FUNCTION IF EXISTS delete_order_on_target_destroy();
 DROP FUNCTION IF EXISTS execute_orders();
 
@@ -176,7 +178,7 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
-CREATE FUNCTION attack_get_the_most_dangerous() RETURNS VOID AS'
+CREATE FUNCTION attack_the_most_dangerous() RETURNS VOID AS'
 DECLARE
 
 BEGIN
@@ -200,6 +202,7 @@ BEGIN
     FROM
         orders
     WHERE orders.weapon_id = weapons.weapon_id;
+
     DELETE FROM targets
     WHERE enemy_id IN (SELECT enemy_id FROM orders);
 END;
@@ -253,6 +256,28 @@ FROM weapons
 INNER JOIN weapon_types
 ON weapon_types.weapon_type_id = weapons.weapon_type_id
 ORDER BY weapons.charge;
+
+CREATE VIEW defense_objects_in_danger AS
+SELECT
+    defense_objects.defense_object_id AS defense_object_id,
+    defense_objects_types.defense_object_type_name AS name,
+    SUM(defense_objects_types.importance * distance(targets.x, defense_objects.x, targets.y, defense_objects.y)) AS danger
+FROM targets, defense_objects
+INNER JOIN defense_objects_types
+ON defense_objects_types.defense_object_type_id = defense_objects.defense_object_type_id 
+WHERE targets.enemy_id NOT IN (SELECT enemy_id FROM orders)
+GROUP BY defense_objects.defense_object_id, defense_objects_types.defense_object_type_name 
+ORDER BY danger DESC;
+
+CREATE VIEW weapons_types_statistics AS
+SELECT
+    weapon_types.weapon_type_name AS weapon_type,
+    COUNT(*) AS counter
+FROM weapons
+INNER JOIN weapon_types
+ON weapon_types.weapon_type_id = weapons.weapon_type_id
+GROUP BY weapon_types.weapon_type_id
+ORDER BY counter DESC;
 
 --trigers
 --CREATE TRIGGER DELETE_ORDER_ON_TARGET_DESTROY BEFORE DELETE ON targets FOR EACH ROW EXECUTE PROCEDURE delete_order_on_target_destroy();

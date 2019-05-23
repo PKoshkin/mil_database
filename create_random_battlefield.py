@@ -6,6 +6,7 @@ MIN_HEIGHT = 0
 MAX_HEIGHT = 10
 MIN_VELOCITY = 100
 MAX_VELOCITY = 1100
+N_OBJECTS = 5
 
 
 def make_target(x, y, height, velocity_x, velocity_y, handler):
@@ -60,6 +61,6 @@ def make_defense_objects(number, handler):
 
 if __name__ == "__main__":
     with open("create_battlefield.sql", "w") as handler:
-        make_defense_objects(10, handler)
-        make_weapons(10, handler)
-        make_targets(10, handler)
+        make_defense_objects(N_OBJECTS, handler)
+        make_weapons(N_OBJECTS, handler)
+        make_targets(N_OBJECTS, handler)
