@@ -31,6 +31,7 @@ ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk2;
 --drop views
 DROP VIEW IF EXISTS possible_shots;
 DROP VIEW IF EXISTS targets_with_danger;
+DROP VIEW IF EXISTS charge_stocks;
 
 
 --drop triggers
@@ -237,6 +238,14 @@ GROUP BY targets.enemy_id
 HAVING enemy_id NOT IN (SELECT enemy_id FROM orders)
 ORDER BY danger DESC;
 
+CREATE VIEW charge_stocks AS
+SELECT
+    weapon_types.weapon_type_name AS weapon_type,
+    weapons.charge AS charge
+FROM weapons
+INNER JOIN weapon_types
+ON weapon_types.weapon_type_id = weapons.weapon_type_id
+ORDER BY weapons.charge;
 
 --trigers
 CREATE TRIGGER DELETE_ORDER_ON_TARGET_DESTROY BEFORE DELETE ON targets FOR EACH ROW EXECUTE PROCEDURE delete_order_on_target_destroy();
