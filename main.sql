@@ -1,3 +1,26 @@
+--revoke grants
+REVOKE INSERT, UPDATE, DELETE ON TABLE targets FROM GROUP writers;
+REVOKE INSERT, UPDATE, DELETE ON TABLE weapons FROM GROUP writers;
+REVOKE INSERT, UPDATE, DELETE ON TABLE weapon_types FROM GROUP writers;
+REVOKE INSERT, UPDATE, DELETE ON TABLE defense_objects FROM GROUP writers;
+REVOKE INSERT, UPDATE, DELETE ON TABLE defense_objects_types FROM GROUP writers;
+REVOKE INSERT, UPDATE, DELETE ON TABLE orders FROM GROUP writers;
+
+REVOKE SELECT ON TABLE targets FROM GROUP readers;
+REVOKE SELECT ON TABLE weapons FROM GROUP readers;
+REVOKE SELECT ON TABLE weapon_types FROM GROUP readers;
+REVOKE SELECT ON TABLE defense_objects FROM GROUP readers;
+REVOKE SELECT ON TABLE defense_objects_types FROM GROUP readers;
+REVOKE SELECT ON TABLE orders FROM GROUP readers;
+
+
+--drop users
+DROP USER IF EXISTS reader1;
+DROP USER IF EXISTS reader2;
+DROP USER IF EXISTS writer1;
+DROP USER IF EXISTS writer2;
+
+
 --delete foreign keys
 ALTER TABLE IF EXISTS weapons DROP CONSTRAINT IF EXISTS weapons_fk;
 ALTER TABLE IF EXISTS defense_objects DROP CONSTRAINT IF EXISTS defense_objects_fk;
@@ -7,7 +30,7 @@ ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk2;
 
 --drop views
 DROP VIEW IF EXISTS possible_shots;
-DROP VIEW IF EXISTS targets_with_danger ;
+DROP VIEW IF EXISTS targets_with_danger;
 
 
 --drop triggers
@@ -30,6 +53,24 @@ DROP FUNCTION IF EXISTS get_the_most_dangerous();
 DROP FUNCTION IF EXISTS attack_get_the_most_dangerous();
 DROP FUNCTION IF EXISTS delete_order_on_target_destroy();
 DROP FUNCTION IF EXISTS execute_orders();
+
+
+--drop groups
+DROP GROUP IF EXISTS readers;
+DROP GROUP IF EXISTS writers;
+
+--create users
+CREATE GROUP readers;
+CREATE GROUP writers;
+
+CREATE USER reader1 WITH PASSWORD 'reader1';
+CREATE USER reader2 WITH PASSWORD 'reader2';
+
+CREATE USER writer1 WITH PASSWORD 'writer1';
+CREATE USER writer2 WITH PASSWORD 'writer2';
+
+ALTER GROUP readers ADD USER reader1, reader2;
+ALTER GROUP writers ADD USER writer1, writer2;
 
 
 --create tables
@@ -199,3 +240,19 @@ ORDER BY danger DESC;
 
 --trigers
 CREATE TRIGGER DELETE_ORDER_ON_TARGET_DESTROY BEFORE DELETE ON targets FOR EACH ROW EXECUTE PROCEDURE delete_order_on_target_destroy();
+
+
+--grants
+GRANT INSERT, UPDATE, DELETE ON TABLE targets TO GROUP writers;
+GRANT INSERT, UPDATE, DELETE ON TABLE weapons TO GROUP writers;
+GRANT INSERT, UPDATE, DELETE ON TABLE weapon_types TO GROUP writers;
+GRANT INSERT, UPDATE, DELETE ON TABLE defense_objects TO GROUP writers;
+GRANT INSERT, UPDATE, DELETE ON TABLE defense_objects_types TO GROUP writers;
+GRANT INSERT, UPDATE, DELETE ON TABLE orders TO GROUP writers;
+
+GRANT SELECT ON TABLE targets TO GROUP readers;
+GRANT SELECT ON TABLE weapons TO GROUP readers;
+GRANT SELECT ON TABLE weapon_types TO GROUP readers;
+GRANT SELECT ON TABLE defense_objects TO GROUP readers;
+GRANT SELECT ON TABLE defense_objects_types TO GROUP readers;
+GRANT SELECT ON TABLE orders TO GROUP readers;
