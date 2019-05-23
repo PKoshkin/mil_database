@@ -54,7 +54,7 @@ DROP FUNCTION IF EXISTS norm(decimal, decimal);
 DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
 DROP FUNCTION IF EXISTS get_the_most_dangerous();
 DROP FUNCTION IF EXISTS attack_the_most_dangerous();
-DROP FUNCTION IF EXISTS delete_order_on_target_destroy();
+--DROP FUNCTION IF EXISTS delete_order_on_target_destroy();
 DROP FUNCTION IF EXISTS execute_orders();
 
 
@@ -101,7 +101,7 @@ CREATE TABLE weapon_types (
     min_height DECIMAL NOT NULL CHECK (min_height >= 0),
     max_charge INTEGER NOT NULL CHECK (max_charge >= 0),
     max_velocity DECIMAL NOT NULL CHECK (max_velocity >= 0),
-    weapon_type_name varchar(100) NOT NULL,
+    weapon_type_name varchar(100) NOT NULL UNIQUE,
     CONSTRAINT weapon_types_pk PRIMARY KEY (weapon_type_id),
     CHECK (max_height >= min_height)
 );
@@ -115,7 +115,7 @@ CREATE TABLE defense_objects (
 CREATE TABLE defense_objects_types (
     defense_object_type_id SERIAL NOT NULL,
     importance DECIMAL NOT NULL,
-    defense_object_type_name varchar(100) NOT NULL,
+    defense_object_type_name varchar(100) NOT NULL UNIQUE,
     CONSTRAINT defense_objects_types_pk PRIMARY KEY (defense_object_type_id)
 );
 CREATE TABLE orders (
