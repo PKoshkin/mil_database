@@ -100,7 +100,8 @@ CREATE TABLE weapon_types (
     max_charge INTEGER NOT NULL CHECK (max_charge >= 0),
     max_velocity DECIMAL NOT NULL CHECK (max_velocity >= 0),
     weapon_type_name varchar(100) NOT NULL,
-    CONSTRAINT weapon_types_pk PRIMARY KEY (weapon_type_id)
+    CONSTRAINT weapon_types_pk PRIMARY KEY (weapon_type_id),
+    CHECK (max_height >= min_height)
 );
 CREATE TABLE defense_objects (
     defense_object_id SERIAL NOT NULL,
@@ -117,8 +118,8 @@ CREATE TABLE defense_objects_types (
 );
 CREATE TABLE orders (
     order_id SERIAL NOT NULL,
-    enemy_id INTEGER NOT NULL,
-    weapon_id INTEGER NOT NULL,
+    enemy_id INTEGER NOT NULL UNIQUE,
+    weapon_id INTEGER NOT NULL UNIQUE,
     CONSTRAINT orders_pk PRIMARY KEY (order_id)
 );
 
