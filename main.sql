@@ -192,6 +192,13 @@ CREATE FUNCTION execute_orders() RETURNS VOID AS'
 DECLARE
 
 BEGIN
+    UPDATE
+        weapons
+    SET
+        charge = charge - 1
+    FROM
+        orders
+    WHERE orders.weapon_id = weapons.weapon_id;
     DELETE FROM targets
     WHERE enemy_id IN (SELECT enemy_id FROM orders);
 END;
