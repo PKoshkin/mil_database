@@ -35,7 +35,7 @@ DROP VIEW IF EXISTS charge_stocks;
 
 
 --drop triggers
-DROP TRIGGER IF EXISTS DELETE_ORDER_ON_TARGET_DESTROY ON targets;
+--DROP TRIGGER IF EXISTS DELETE_ORDER_ON_TARGET_DESTROY ON targets;
 
 
 --drop tables
@@ -127,8 +127,8 @@ CREATE TABLE orders (
  --create foreign keys
 ALTER TABLE weapons ADD CONSTRAINT weapons_fk FOREIGN KEY (weapon_type_id) REFERENCES weapon_types(weapon_type_id);
 ALTER TABLE defense_objects ADD CONSTRAINT defense_objects_fk FOREIGN KEY (defense_object_type_id) REFERENCES defense_objects_types(defense_object_type_id);
-ALTER TABLE orders ADD CONSTRAINT orders_fk1 FOREIGN KEY (enemy_id) REFERENCES targets(enemy_id);
-ALTER TABLE orders ADD CONSTRAINT orders_fk2 FOREIGN KEY (weapon_id) REFERENCES weapons(weapon_id);
+ALTER TABLE orders ADD CONSTRAINT orders_fk1 FOREIGN KEY (enemy_id) REFERENCES targets(enemy_id) ON DELETE CASCADE;
+ALTER TABLE orders ADD CONSTRAINT orders_fk2 FOREIGN KEY (weapon_id) REFERENCES weapons(weapon_id) ON DELETE RESTRICT;
 
 
 --insert values to constant tables
@@ -205,15 +205,14 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
-CREATE FUNCTION delete_order_on_target_destroy() RETURNS TRIGGER AS'
-DECLARE
-
-BEGIN
-    DELETE FROM ORDERS
-    WHERE enemy_id = OLD.enemy_id;
-    RETURN OLD;
-END;
-' LANGUAGE plpgsql;
+--CREATE FUNCTION delete_order_on_target_destroy() RETURNS TRIGGER AS'
+--DECLARE
+--BEGIN
+--    DELETE FROM ORDERS
+--    WHERE enemy_id = OLD.enemy_id;
+--    RETURN OLD;
+--END;
+--' LANGUAGE plpgsql;
 
 
 --views
@@ -256,7 +255,7 @@ ON weapon_types.weapon_type_id = weapons.weapon_type_id
 ORDER BY weapons.charge;
 
 --trigers
-CREATE TRIGGER DELETE_ORDER_ON_TARGET_DESTROY BEFORE DELETE ON targets FOR EACH ROW EXECUTE PROCEDURE delete_order_on_target_destroy();
+--CREATE TRIGGER DELETE_ORDER_ON_TARGET_DESTROY BEFORE DELETE ON targets FOR EACH ROW EXECUTE PROCEDURE delete_order_on_target_destroy();
 
 
 --grants
