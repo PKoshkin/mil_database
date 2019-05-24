@@ -50,8 +50,9 @@ DROP TABLE IF EXISTS orders;
 
 
 --drop functions
-DROP FUNCTION IF EXISTS norm(decimal, decimal);
-DROP FUNCTION IF EXISTS distance(decimal, decimal, decimal, decimal);
+DROP FUNCTION IF EXISTS norm(DECIMAL, DECIMAL);
+DROP FUNCTION IF EXISTS distance(DECIMAL, DECIMAL, DECIMAL, DECIMAL);
+DROP FUNCTION IF EXISTS attack_enemy(INTEGER);
 DROP FUNCTION IF EXISTS get_the_most_dangerous();
 DROP FUNCTION IF EXISTS attack_the_most_dangerous();
 --DROP FUNCTION IF EXISTS delete_order_on_target_destroy();
@@ -145,7 +146,7 @@ INSERT INTO defense_objects_types (importance, defense_object_type_name) VALUES 
 
 
 --functions
-CREATE FUNCTION norm(decimal, decimal) RETURNS DECIMAL AS '
+CREATE FUNCTION norm(DECIMAL, DECIMAL) RETURNS DECIMAL AS '
 DECLARE
     result DECIMAL;
 BEGIN
@@ -154,7 +155,7 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
-CREATE FUNCTION distance(decimal, decimal, decimal, decimal) RETURNS DECIMAL AS '
+CREATE FUNCTION distance(DECIMAL, DECIMAL, DECIMAL, DECIMAL) RETURNS DECIMAL AS '
 DECLARE
     result DECIMAL;
 BEGIN
@@ -178,16 +179,41 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
-CREATE FUNCTION attack_the_most_dangerous() RETURNS VOID AS'
+CREATE FUNCTION attack_enemy(INTEGER) RETURNS VOID AS'
 DECLARE
 
 BEGIN
     INSERT INTO orders (enemy_id, weapon_id)
     SELECT enemy_id, weapon_id
-    FROM possible_shots
-    WHERE enemy_id = get_the_most_dangerous()
-    ORDER BY distance
-    LIMIT 1;
+    FROM (
+        SELECT
+            targets.enemy_id AS enemy_id,
+            weapons.weapon_id AS weapon_id,
+            distance(weapons.x, targets.x, weapons.y, targets.y) AS distance
+        FROM targets, weapons
+        INNER JOIN weapon_types
+        ON weapon_types.weapon_type_id = weapons.weapon_type_id
+        WHERE (distance(weapons.x, targets.x, weapons.y, targets.y) < weapon_types.distance_range)
+            AND (targets.height <= weapon_types.max_height)
+            AND (targets.height >= weapon_types.min_height)
+            AND (norm(targets.velocity_x, targets.velocity_y) < weapon_types.max_velocity)
+            AND weapons.weapon_id NOT IN (SELECT weapon_id FROM orders)
+            AND weapons.charge > 0
+            AND targets.enemy_id NOT IN (SELECT enemy_id FROM orders)
+            AND targets.enemy_id = $1
+        ORDER BY distance
+        LIMIT 1
+    ) AS tmp;
+END;
+' LANGUAGE plpgsql;
+
+CREATE FUNCTION attack_the_most_dangerous() RETURNS VOID AS'
+DECLARE
+    the_most_dangerous INTEGER;
+BEGIN
+
+    SELECT get_the_most_dangerous() INTO the_most_dangerous;
+    PERFORM attack_enemy(the_most_dangerous);
 END;
 ' LANGUAGE plpgsql;
 
