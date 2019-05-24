@@ -61,6 +61,7 @@ def make_defense_objects(number, handler):
 
 if __name__ == "__main__":
     with open("create_battlefield.sql", "w") as handler:
+        make_targets(N_OBJECTS, handler)
         make_defense_objects(N_OBJECTS, handler)
         make_weapons(N_OBJECTS, handler)
         make_targets(N_OBJECTS, handler)

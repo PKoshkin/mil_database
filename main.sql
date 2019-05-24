@@ -53,9 +53,9 @@ DROP TABLE IF EXISTS orders;
 DROP FUNCTION IF EXISTS norm(DECIMAL, DECIMAL);
 DROP FUNCTION IF EXISTS distance(DECIMAL, DECIMAL, DECIMAL, DECIMAL);
 DROP FUNCTION IF EXISTS attack_enemy(INTEGER);
+DROP FUNCTION IF EXISTS attack_new_enemy();
 DROP FUNCTION IF EXISTS get_the_most_dangerous();
 DROP FUNCTION IF EXISTS attack_the_most_dangerous();
---DROP FUNCTION IF EXISTS delete_order_on_target_destroy();
 DROP FUNCTION IF EXISTS execute_orders();
 
 
@@ -234,14 +234,14 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
---CREATE FUNCTION delete_order_on_target_destroy() RETURNS TRIGGER AS'
---DECLARE
---BEGIN
---    DELETE FROM ORDERS
---    WHERE enemy_id = OLD.enemy_id;
---    RETURN OLD;
---END;
---' LANGUAGE plpgsql;
+CREATE FUNCTION attack_new_enemy() RETURNS TRIGGER AS'
+DECLARE
+BEGIN
+    PERFORM attack_enemy(NEW.enemy_id);
+    PERFORM execute_orders();
+    RETURN NEW;
+END;
+' LANGUAGE plpgsql;
 
 
 --views
@@ -306,7 +306,7 @@ GROUP BY weapon_types.weapon_type_id
 ORDER BY counter DESC;
 
 --trigers
---CREATE TRIGGER DELETE_ORDER_ON_TARGET_DESTROY BEFORE DELETE ON targets FOR EACH ROW EXECUTE PROCEDURE delete_order_on_target_destroy();
+CREATE TRIGGER ATTACK_NEW_TARGET AFTER INSERT ON targets FOR EACH ROW EXECUTE PROCEDURE attack_new_enemy();
 
 
 --grants
