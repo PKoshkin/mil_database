@@ -6,7 +6,7 @@ MIN_HEIGHT = 0
 MAX_HEIGHT = 10
 MIN_VELOCITY = 100
 MAX_VELOCITY = 1100
-N_OBJECTS = 10
+N_OBJECTS = 100
 
 
 def make_target(x, y, height, velocity_x, velocity_y, handler):
