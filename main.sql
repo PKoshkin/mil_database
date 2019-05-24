@@ -6,7 +6,8 @@ DROP USER IF EXISTS writer2;
 
 
 --delete foreign keys
-ALTER TABLE IF EXISTS weapons DROP CONSTRAINT IF EXISTS weapons_fk;
+ALTER TABLE IF EXISTS weapons DROP CONSTRAINT IF EXISTS weapons_fk1;
+ALTER TABLE IF EXISTS weapons DROP CONSTRAINT IF EXISTS weapons_fk2;
 ALTER TABLE IF EXISTS defense_objects DROP CONSTRAINT IF EXISTS defense_objects_fk;
 ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk1;
 ALTER TABLE IF EXISTS orders DROP CONSTRAINT IF EXISTS orders_fk2;
@@ -31,6 +32,7 @@ DROP TABLE IF EXISTS weapon_types;
 DROP TABLE IF EXISTS defense_objects;
 DROP TABLE IF EXISTS defense_objects_types;
 DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS commanders ;
 
 
 --drop functions
@@ -74,6 +76,7 @@ CREATE TABLE targets (
 CREATE TABLE weapons (
     weapon_id SERIAL NOT NULL,
     weapon_type_id INTEGER NOT NULL,
+    commander_id INTEGER NOT NULL UNIQUE,
     charge INTEGER NOT NULL CHECK (charge >= 0),
     x DECIMAL NOT NULL,
     y DECIMAL NOT NULL,
@@ -109,6 +112,13 @@ CREATE TABLE orders (
     weapon_id INTEGER NOT NULL UNIQUE,
     CONSTRAINT orders_pk PRIMARY KEY (order_id)
 );
+CREATE TABLE commanders (
+    commander_id SERIAL NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    surname VARCHAR(100) NOT NULL,
+    age INTEGER NOT NULL CHECK (age >= 18),
+    CONSTRAINT commanders_pk PRIMARY KEY (commander_id)
+);
 
 
 --revoke grants
@@ -128,7 +138,8 @@ REVOKE ALL PRIVILEGES ON TABLE orders FROM GROUP readers;
 
 
  --create foreign keys
-ALTER TABLE weapons ADD CONSTRAINT weapons_fk FOREIGN KEY (weapon_type_id) REFERENCES weapon_types(weapon_type_id);
+ALTER TABLE weapons ADD CONSTRAINT weapons_fk1 FOREIGN KEY (weapon_type_id) REFERENCES weapon_types(weapon_type_id);
+ALTER TABLE weapons ADD CONSTRAINT weapons_fk2 FOREIGN KEY (commander_id) REFERENCES commanders(commander_id);
 ALTER TABLE defense_objects ADD CONSTRAINT defense_objects_fk FOREIGN KEY (defense_object_type_id) REFERENCES defense_objects_types(defense_object_type_id);
 ALTER TABLE orders ADD CONSTRAINT orders_fk1 FOREIGN KEY (enemy_id) REFERENCES targets(enemy_id) ON DELETE CASCADE;
 ALTER TABLE orders ADD CONSTRAINT orders_fk2 FOREIGN KEY (weapon_id) REFERENCES weapons(weapon_id) ON DELETE RESTRICT;
